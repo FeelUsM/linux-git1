@@ -25,8 +25,8 @@ df
 # In[7]:
 
 
-#df.country = df.country.apply(lambda s: s.upper())
-#df.hotel_name = df.hotel_name.apply(lambda s: s.lower())
+df.country = df.country.apply(lambda s: s.lower())
+df.hotel_name = df.hotel_name.apply(lambda s: s.lower())
 
 
 # In[ ]:
