@@ -29,3 +29,4 @@
 #echo run:
 /home/users/FeelUsM/miniforge3/bin/python Untitled.py $1 
 #echo run:$?
+touch fit.log
