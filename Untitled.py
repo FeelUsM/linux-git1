@@ -54,13 +54,13 @@ df.groupby("country").count().doc_id.reset_index().\
 # In[10]:
 
 
-tmp = df[df.hotel_name.apply(lambda x:'holiday inn' in x)].groupby("country").CLEANLINESS.mean()
+tmp = df[df.hotel_name.apply(lambda x:'holiday inn' in x) & ~df.overall_ratingsource.isna()].groupby("country").CLEANLINESS.mean()
 tmp
 
 # In[11]:
 
 
-tmp2 = df[df.hotel_name.apply(lambda x:'hilton' in x)].groupby("country").CLEANLINESS.mean()
+tmp2 = df[df.hotel_name.apply(lambda x:'hilton' in x) & ~df.overall_ratingsource.isna()].groupby("country").CLEANLINESS.mean()
 tmp2
 
 # In[12]:
