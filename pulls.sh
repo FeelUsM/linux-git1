@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 
 # Проверка на наличие аргумента
 if [ -z "$1" ]; then
@@ -7,24 +9,41 @@ if [ -z "$1" ]; then
 fi
 
 USERNAME="$1"
+TOKEN=$(cat /home/users/FeelUsM/github_token)
 REPO="datamove/linux-git2"
 all_pulls=()
 page=1
+max_pages=20  # Максимальное количество страниц для загрузки
 
+if true; then
 # Получение всех пулл-реквестов пользователя с постраничным запросом
-while :; do
+echo '' > all_pulls.json
+while [ "$page" -le "$max_pages" ]; do
+    #echo $page
+
     # Запрос с указанием страницы и лимита
-    pulls=$(curl -s "https://api.github.com/repos/$REPO/pulls?state=all&per_page=100&page=$page" | jq --arg username "$USERNAME" '.[] | select(.user.login == $username)')
-    
+    pulls=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/pulls?state=all&per_page=100&page=$page" )
+    echo $pulls >> all_pulls.json
+
+
     # Проверка на окончание данных
     if [ -z "$pulls" ]; then
         break
     fi
-    
+
     # Добавление результатов текущей страницы к общему массиву
     all_pulls+=("$pulls")
     ((page++))
 done
+else
+    echo load from file
+    all_pulls=$(cat all_pulls.json)
+    echo loaded from file
+fi
+
+all_pulls=$(echo $all_pulls | jq --arg username "$USERNAME" '.[] | select(.user.login == $username)')
+
+#echo $all_pulls > all_pulls-"$USERNAME".json
 
 # Объединяем все страницы пулл-реквестов в один JSON массив
 all_pulls_json=$(printf "%s\n" "${all_pulls[@]}" | jq -s '.')
