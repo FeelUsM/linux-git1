@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 # Проверка на наличие аргумента
 if [ -z "$1" ]; then
     echo "Usage: $0 <github-username>"
@@ -17,28 +16,29 @@ max_pages=20  # Максимальное количество страниц д�
 
 if true; then
 # Получение всех пулл-реквестов пользователя с постраничным запросом
-echo '' > all_pulls.json
+#echo '' > all_pulls.json
 while [ "$page" -le "$max_pages" ]; do
     #echo $page
 
     # Запрос с указанием страницы и лимита
     pulls=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/pulls?state=all&per_page=100&page=$page" )
-    echo $pulls >> all_pulls.json
+    #echo $pulls >> all_pulls.json
 
 
     # Проверка на окончание данных
-    if [ -z "$pulls" ]; then
+    if [ -z "$(echo $pulls | jq '.[]')" ]; then
         break
     fi
 
     # Добавление результатов текущей страницы к общему массиву
-    all_pulls+=("$pulls")
+
+    all_pulls+=$'\n'"$pulls"
     ((page++))
 done
+#echo $all_pulls > all_pulls2.json
 else
     echo load from file
     all_pulls=$(cat all_pulls.json)
-    echo loaded from file
 fi
 
 all_pulls=$(echo $all_pulls | jq --arg username "$USERNAME" '.[] | select(.user.login == $username)')
